@@ -1,0 +1,68 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+      - id: check-ast
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: end-of-file-fixer
+      - id: debug-statements
+      - id: trailing-whitespace
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.2 # Ruff version
+    hooks:
+      # Run the linter.
+      # Needs to placed before black, isort, and other formatters
+      - id: ruff
+        args: [--fix]
+  - repo: https://github.com/psf/black
+    rev: 24.4.2
+    hooks:
+      - id: black
+        language_version: python3.11
+        additional_dependencies: ["toml"]
+  - repo: https://github.com/PyCQA/docformatter
+    rev: v1.7.5
+    hooks:
+      - id: docformatter
+        args: ["--in-place", "--config=./pyproject.toml", "-r", "scripts/", "src/", "tests/"]
+        language: python
+        types: ["python"]
+  - repo: https://github.com/kplaube/pre-commit-dodgy
+    rev: 0.0.2
+    hooks:
+      - id: dodgy
+  - repo: https://github.com/econchick/interrogate
+    rev: 1.7.0
+    hooks:
+      - id: interrogate
+        args: [--fail-under=0, --ignore-init-module, --style=google, -vv, --exclude=scripts, src]
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        language: python
+        additional_dependencies: ["toml"]
+  - repo: https://github.com/asmeurer/removestar
+    rev: "1.5"
+    hooks:
+      - id: removestar
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: pylint
+        language: python
+        types: ["python"]
+        args: ["--fail-under=5", "--fail-on=E"]
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.8.1
+    hooks:
+      - id: nbstripout
+        name: strip outputs from Jupyter notebooks
+        files: \.ipynb$

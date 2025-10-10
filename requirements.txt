@@ -1,0 +1,186 @@
+astroid==3.3.8
+    # via pylint
+bcrypt==4.2.0
+    # via paramiko
+bokeh==3.6.1
+cffi==1.17.1
+    # via
+    #   cryptography
+    #   pynacl
+cfgv==3.4.0
+    # via pre-commit
+choreographer==1.0.10
+    # via kaleido
+click==8.1.7
+    # via
+    #   dask
+    #   distributed
+cloudpickle==3.1.0
+    # via
+    #   dask
+    #   distributed
+contourpy==1.3.0
+    # via
+    #   bokeh
+    #   matplotlib
+coverage[toml]==7.6.4
+    # via pytest-cov
+cryptography==43.0.3
+    # via paramiko
+cycler==0.12.1
+    # via matplotlib
+dask==2024.10.0
+    # via
+    #   dask-jobqueue
+    #   distributed
+dask-jobqueue==0.9.0
+decorator==5.1.1
+    # via fabric
+deprecated==1.2.14
+    # via fabric
+dill==0.3.9
+    # via pylint
+distlib==0.3.8
+    # via virtualenv
+distributed==2024.10.0
+    # via dask-jobqueue
+fabric==3.2.2
+filelock==3.16.1
+    # via virtualenv
+fonttools==4.54.1
+    # via matplotlib
+fourcipp
+fsspec==2024.10.0
+    # via dask
+identify==2.5.36
+    # via pre-commit
+importlib-metadata==6.11.0
+    # via dask
+iniconfig==2.0.0
+    # via pytest
+invoke==2.2.0
+    # via fabric
+ipykernel==6.30.1
+isort==5.13.2
+    # via pylint
+jinja2==3.1.4
+    # via
+    #   bokeh
+    #   distributed
+kaleido==0.2.1
+kiwisolver==1.4.7
+    # via matplotlib
+llvmlite==0.43.0
+    # via numba
+locket==1.0.0
+    # via
+    #   distributed
+    #   partd
+logistro==1.1.0
+    # via kaleido
+markupsafe==3.0.2
+    # via jinja2
+matplotlib==3.9.2
+mccabe==0.7.0
+    # via pylint
+msgpack==1.1.0
+    # via distributed
+nbstripout==0.8.1
+nodeenv==1.9.1
+    # via pre-commit
+numba==0.60.0
+numpy==1.26.4
+    # via
+    #   bokeh
+    #   contourpy
+    #   matplotlib
+    #   numba
+    #   pandas
+    #   scipy
+orjson==3.11.3
+    # via kaleido
+packaging==24.1
+    # via
+    #   bokeh
+    #   dask
+    #   distributed
+    #   matplotlib
+    #   pytest
+pandas==2.2.3
+    # via bokeh
+paramiko==3.5.0
+    # via fabric
+partd==1.4.2
+    # via dask
+pillow==11.0.0
+    # via
+    #   bokeh
+    #   matplotlib
+platformdirs==4.3.6
+    # via
+    #   pylint
+    #   virtualenv
+pluggy==1.5.0
+    # via pytest
+pre-commit==3.7.1
+psutil==6.1.0
+    # via distributed
+pycparser==2.22
+    # via cffi
+pylint==3.3.4
+pynacl==1.5.0
+    # via paramiko
+pyparsing==3.2.0
+    # via matplotlib
+pytest==8.3.3
+    # via pytest-cov
+pytest-cov==5.0.0
+python-dateutil==2.9.0.post0
+    # via
+    #   matplotlib
+    #   pandas
+pytz==2024.2
+    # via pandas
+pyvista==0.44.1
+pyyaml==6.0.2
+    # via
+    #   bokeh
+    #   dask
+    #   distributed
+    #   pre-commit
+ruff==0.9.6
+scipy==1.14.1
+simplejson==3.20.1
+    # via kaleido
+six==1.16.0
+    # via python-dateutil
+sortedcontainers==2.4.0
+    # via distributed
+tblib==3.0.0
+    # via distributed
+tomlkit==0.13.2
+    # via pylint
+toolz==1.0.0
+    # via
+    #   dask
+    #   distributed
+    #   partd
+tornado==6.4.1
+    # via
+    #   bokeh
+    #   distributed
+tqdm==4.66.6
+tzdata==2024.2
+    # via pandas
+urllib3==2.2.3
+    # via distributed
+virtualenv==20.26.2
+    # via pre-commit
+wrapt==1.16.0
+    # via deprecated
+xyzservices==2024.9.0
+    # via bokeh
+zict==3.0.0
+    # via distributed
+zipp==3.20.2
+    # via importlib-metadata

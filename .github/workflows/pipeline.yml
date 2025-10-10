@@ -1,0 +1,71 @@
+name: Run code checks and tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  code-checks-and_tests:
+    name: Check code quality and run tests
+    runs-on: ubuntu-latest
+    permissions:
+      # Gives the action the necessary permissions for pushing data to the
+      # python-coverage-comment-action branch, and for editing existing
+      # comments (to avoid publishing multiple comments in the same PR)
+      contents: write
+      # Gives the action the necessary permissions for publishing new
+      # comments in pull requests.
+      pull-requests: write
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: True
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -e .
+
+      - name: Install queens
+        shell: bash -el {0}
+        run: |
+          git clone https://github.com/queens-py/queens.git
+          cd queens
+          git checkout 699d819baf0bb77ca75aaf2c376428b4ea132d2f
+          pip install .[safe,fourc]
+          cd ..
+
+      - name: Run pre-commit to check code quality
+        shell: bash -el {0}
+        run: pre-commit run --all-files
+
+      - name: Run tests
+        run: pytest
+      - name: Upload html coverage report
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: coverage
+          path: htmlcov/
+
+      - name: Create coverage badge
+        id: coverage_comment
+        uses: py-cov-action/python-coverage-comment-action@v3
+        with:
+          MINIMUM_GREEN: 90
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Store coverage badge and comment in separate branch
+        uses: actions/upload-artifact@v4
+        if: steps.coverage_comment.outputs.COMMENT_FILE_WRITTEN == 'true'
+        with:
+          name: python-coverage-comment-action
+          path: python-coverage-comment-action.txt

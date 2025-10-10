@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the following article:"
+type: generic
+title: "Multi-Physics-Enhanced Bayesian Inverse Analysis: Information Gain from Additional Fields"
+authors:
+  - given-names: "Lea J."
+    family-names: "Haeusel"
+    orcid: "https://orcid.org/0009-0007-2462-3033"
+  - given-names: "Jonas"
+    family-names: "Nitzler"
+    orcid: "https://orcid.org/0000-0002-7258-5664"
+  - given-names: "Lea J."
+    family-names: "Köglmeier"
+    orcid: "https://orcid.org/0009-0004-1477-7424"
+  - given-names: "Wolfgang A."
+    family-names: "Wall"
+    orcid: "https://orcid.org/0000-0001-7419-3384"
+year: 2025
+status: preprint
+url: "https://arxiv.org/abs/TODO"

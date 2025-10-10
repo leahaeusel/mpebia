@@ -1,0 +1,106 @@
+"""Evaluate poro model on a grid of different Young's moduli."""
+
+import logging
+from pathlib import Path
+
+from queens.distributions import FreeVariable, Uniform
+from queens.drivers import Jobscript
+from queens.global_settings import GlobalSettings
+from queens.main import run_iterator
+from queens.models import Simulation
+from queens.parameters.parameters import Parameters
+from queens.utils.remote_operations import RemoteConnection
+
+from mpebia.output import get_directory
+from mpebia.porous_medium_model.parameters_riig_grid import ParametersRIIGGrid as params_riig
+from mpebia.porous_medium_model.parameters_shared import ParametersShared as params
+from mpebia.porous_medium_model.poro_data_processor import PoroDataProcessor
+from mpebia.porous_medium_model.poro_grid_iterator import PoroGridIterator
+from mpebia.porous_medium_model.poro_schedulers import PoroClusterScheduler
+
+logger = logging.getLogger(__name__)
+
+
+################################################################
+# Needs to be adapted personally:
+fourc_build_dir = "<path_to_remote_4C_executable>"
+input_dir_cluster = "<path_to_remote_poro_geometry>"
+cluster_ip = "<ip_address_remote_cluster>"
+cluster_user = "<username_remote_cluster>"
+remote_python = "<path_to_remote_env_manager>/envs/mpebia/bin/python"
+remote_queens_repository = Path("<path_to_remote_queens_repository>")
+local_queens_repository = Path("<path_to_local_queens_repository>")
+################################################################
+
+directory = get_directory(__file__)
+input_dir = (directory / "..").resolve()
+fourc_input_template = input_dir / "poro_input_with_blood.4C.yaml"
+fourc_geometry_local = input_dir / "poro_geometry_with_arteries.4C.yaml"
+
+experiment_name = "mpebia_poro_ground_truth_different_kjs"
+
+global_settings = GlobalSettings(experiment_name=experiment_name, output_dir=directory)
+
+with global_settings as gs:
+    young_h = FreeVariable(dimension=1)
+    young_d = FreeVariable(dimension=1)
+    k_j = Uniform(lower_bound=params_riig.kj_min, upper_bound=params_riig.kj_max)
+    input_dir_var = FreeVariable(dimension=1)
+    parameters = Parameters(young_h=young_h, young_d=young_d, k_j=k_j, input_dir=input_dir_var)
+
+    data_processor = PoroDataProcessor(
+        file_name_identifier="*porofluid.pvd",
+        file_options_dict={
+            "time_steps": [-1],
+            "data_fields": ["ale-displacement", "volfrac_blood_lung"],
+            "input_file": fourc_geometry_local,
+            "dlines": [8, 9],
+        },
+    )
+
+    remote_connection = RemoteConnection(
+        host=cluster_ip,
+        user=cluster_user,
+        remote_python=remote_python,
+        remote_queens_repository=remote_queens_repository,
+    )
+    scheduler = PoroClusterScheduler(
+        workload_manager="slurm",
+        walltime="1:00:00",
+        queue="normal",
+        num_jobs=5,
+        num_procs=8,
+        num_nodes=1,
+        remote_connection=remote_connection,
+        experiment_name=gs.experiment_name,
+    )
+    driver = Jobscript(
+        parameters=parameters,
+        input_templates=fourc_input_template,
+        jobscript_template=local_queens_repository / "templates/jobscripts/fourc_thought.sh",
+        executable=fourc_build_dir + "/4C",
+        data_processor=data_processor,
+        extra_options={
+            "cluster_script": "/lnm/share/donottouch.sh",
+        },
+    )
+
+    forward_model = Simulation(scheduler=scheduler, driver=driver)
+
+    iterator = PoroGridIterator(
+        grid_design={
+            "young_h": {"axis_type": "fix", "value": params.young_h_gt, "num_grid_points": 1},
+            "young_d": {"axis_type": "fix", "value": params.young_d_gt, "num_grid_points": 1},
+            "k_j": {"axis_type": "lin", "num_grid_points": params_riig.num_kjs},
+            "input_dir": {"axis_type": "fix", "value": input_dir_cluster, "num_grid_points": 1},
+        },
+        result_description={
+            "write_results": True,
+        },
+        model=forward_model,
+        parameters=parameters,
+        global_settings=gs,
+    )
+
+    # Actual analysis
+    run_iterator(iterator, global_settings=gs)

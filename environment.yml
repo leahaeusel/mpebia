@@ -1,0 +1,15 @@
+name: mpebia
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python==3.11
+  # for performance improvements the following packages are installed via conda
+  - numba==0.60.0
+  - numpy==1.26.4
+  - scipy==1.14.1
+  - libopenblas==0.3.28
+  # remaining dependencies are managed via requirements.in and pip-compile
+  - pip
+  - pip:
+      - pip-tools

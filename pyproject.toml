@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mpebia"
+version = "1.0"
+authors = [{ name = "Lea J. Haeusel" }]
+maintainers = [{ name = "Lea J. Haeusel" }]
+description = "Code and scripts of the publication 'Multi-Physics-Enhanced Bayesian Inverse Analysis: Information Gain from Additional Fields'"
+readme = "README.md"
+license = {file = "LICENSE"}
+keywords = ["Multi-Physics-Enhanced Bayesian Inverse Analysis", "Model calibration", "Multi-physics models", "Multi-physics data", "Coupled fields", "Information gain"]
+
+requires-python = "==3.11.*"
+dynamic = ["dependencies"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["mpebia"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+## Tools
+
+[tool.bandit]
+exclude_dirs = [
+    ".git",
+    "__pycache__",
+]
+
+[tool.black]
+line-length = 100
+
+[tool.coverage.run]
+source = ["src"]
+parallel = true
+relative_files = true
+omit = ["src/mpebia/plotting/*", "*/parameters*"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+filter_files = true
+force_grid_wrap = 0
+multi_line_output = 3
+src_paths = ["scripts/", "src/", "tests/"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-p pytest_cov --cov-report=term --cov-report=html --cov-fail-under=0 --cov=src/mpebia/ --cov-append"
+
+[tool.ruff.lint]
+select = ["D"]    # pydocstyle rules
+ignore = ["D104"] # Missing docstring in public package
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"

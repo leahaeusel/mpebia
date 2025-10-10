@@ -1,0 +1,11 @@
+[MESSAGES CONTROL]
+disable=invalid-name,
+        redefined-outer-name,
+        too-few-public-methods,
+        too-many-arguments,
+        too-many-instance-attributes,
+        too-many-locals,
+        too-many-positional-arguments
+
+ignored-modules=queens,
+                queens_interfaces

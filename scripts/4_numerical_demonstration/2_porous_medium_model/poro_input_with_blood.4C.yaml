@@ -1,0 +1,449 @@
+TITLE:
+  - "Porous medium model"
+PROBLEM SIZE:
+  DIM: 2
+PROBLEM TYPE:
+  PROBLEMTYPE: "porofluid_pressure_based_elasticity_scatra"
+IO/RUNTIME VTK OUTPUT:
+  OUTPUT_DATA_FORMAT: binary
+  INTERVAL_STEPS: 1
+  EVERY_ITERATION: false
+IO/RUNTIME VTK OUTPUT/STRUCTURE:
+  OUTPUT_STRUCTURE: true
+  DISPLACEMENT: true
+  ELEMENT_OWNER: false
+  STRESS_STRAIN: false
+  GAUSS_POINT_DATA_OUTPUT_TYPE: none
+porofluid_elasticity_scatra_dynamic:
+  output:
+    result_data_every: 5
+    restart_data_every: 5
+  total_simulation_time: 2.5
+  time_integration:
+    number_of_time_steps: 25
+    time_step_size: 0.1
+    theta: 1.0
+  nonlinear_solver:
+    maximum_number_of_iterations: 20
+  coupling_scheme: twoway_monolithic
+  artery_coupling_active: true
+porofluid_elasticity_scatra_dynamic/monolithic:
+  nonlinear_solver:
+    linear_solver_id: 1
+    residual:
+      global_tolerance: 1e-08
+    increment:
+      global_tolerance: 1e-08
+STRUCTURAL DYNAMIC:
+  INT_STRATEGY: "Standard"
+  DYNAMICTYPE: "OneStepTheta"
+  LINEAR_SOLVER: 1
+  NEGLECTINERTIA: true
+STRUCTURAL DYNAMIC/ONESTEPTHETA:
+  THETA: 1.0
+porofluid_dynamic:
+  output:
+    volfrac_blood_lung: true
+    determinant_of_deformation_gradient: true
+  time_integration:
+    scheme: one_step_theta
+    theta: 1.0
+    number_of_time_steps: 25
+    time_step_size: 0.1
+  nonlinear_solver:
+    linear_solver_id: 1
+  total_simulation_time: 25
+  initial_condition:
+    type: by_condition
+    function_id: 1
+  flux_reconstruction:
+    active: false
+    solver_id: 1
+porofluid_dynamic/artery_coupling:
+  coupling_method: node_to_point
+  evaluate_in_reference_configuration: true
+  reaction_terms:
+    artery_function_ids: "0"
+    artery_scaling: "0"
+    homogenized_function_ids: "0 0"
+    homogenized_scaling: "0 0"
+porofluid_elasticity_dynamic:
+  solve_structure: true
+  coupling_scheme: "twoway_monolithic"
+SCALAR TRANSPORT DYNAMIC:
+  LINEAR_SOLVER: 1
+  SOLVERTYPE: "nonlinear"
+  MAXTIME: 2.5
+  NUMSTEP: 25
+  THETA: 1.0
+  INITIALFIELD: "field_by_condition"
+  SKIPINITDER: true
+SCALAR TRANSPORT DYNAMIC/STABILIZATION:
+  STABTYPE: "no_stabilization"
+  DEFINITION_TAU: "Zero"
+  EVALUATION_TAU: "integration_point"
+  EVALUATION_MAT: "integration_point"
+SCALAR TRANSPORT DYNAMIC/NONLINEAR:
+  CONVTOL: 1e-07
+  ABSTOLRES: -1
+SCALAR TRANSPORT DYNAMIC/ARTERY COUPLING:
+  coupling_method: node_to_point
+  reaction_terms:
+    artery_function_ids: "0"
+    artery_scaling: "0"
+    homogenized_function_ids: "0"
+    homogenized_scaling: "0"
+ARTERIAL DYNAMIC:
+  LINEAR_SOLVER: 1
+  DYNAMICTYPE: "Stationary"
+  SOLVESCATRA: false
+  INITIALFIELD: "field_by_condition"
+SOLVER 1:
+  NAME: "solver"
+  SOLVER: "UMFPACK"
+MATERIALS:
+  - MAT: 1
+    MAT_FluidPoroMultiPhaseReactions:
+      LOCAL: false
+      PERMEABILITY: 0.0012
+      NUMMAT: 2
+      MATIDS: [12, 13]
+      NUMFLUIDPHASES_IN_MULTIPHASEPORESPACE: 1
+      NUMREAC: 1
+      REACIDS: [50]
+  - MAT: 50
+    MAT_FluidPoroSingleReaction:
+      NUMSCAL: 1
+      TOTALNUMDOF: 2
+      NUMVOLFRAC: 1
+      VOLFRAC_CLOSING_RELATION: "evolutionequation_blood_lung"
+      SCALE: [1, 1]
+      COUPLING: "scalar_by_function"
+      FUNCTID: 4
+  - MAT: 2
+    MAT_StructPoro:
+      MATID: 20
+      POROLAWID: 200
+      INITPOROSITY: 0.8
+  - MAT: 8
+    MAT_StructPoro:
+      MATID: 30
+      POROLAWID: 200
+      INITPOROSITY: 0.8
+  - MAT: 20
+    MAT_Struct_StVenantKirchhoff:
+      YOUNG: {{ young_h }}
+      NUE: 0.3
+      DENS: 1e-06
+  - MAT: 30
+    MAT_Struct_StVenantKirchhoff:
+      YOUNG: {{ young_d }}
+      NUE: 0.3
+      DENS: 1e-06
+  - MAT: 200
+    MAT_PoroLawDensityDependent:
+      DENSITYLAWID: 202
+  - MAT: 202
+    MAT_PoroDensityLawExp:
+      BULKMODULUS: 1e+15
+
+  - MAT: 12
+    MAT_FluidPoroSinglePhase:
+      DOFTYPEID: 121
+      VISCOSITY_LAW_ID: 124
+      DENSITYLAWID: 122
+      DENSITY: 1e-09
+      RELPERMEABILITYLAWID: 125
+  - MAT: 121
+    MAT_FluidPoroSinglePhaseDofPressure:
+      PHASELAWID: 123
+  - MAT: 122
+    MAT_PoroDensityLawExp:
+      BULKMODULUS: 1e+12
+  - MAT: 123
+    MAT_PhaseLawConstraint: {}
+  - MAT: 124
+    MAT_FluidPoroViscosityLawConstant:
+      VALUE: 1.5e-08
+  - MAT: 125
+    MAT_FluidPoroRelPermeabilityLawConstant:
+      VALUE: 1.0
+
+  - MAT: 13
+    MAT_FluidPoroVolFracPressureBloodLung:
+      DENSITY: 1.03e-06
+      PERMEABILITY: 0.15e-3
+      VISCOSITY_LAW_ID: 141
+      INITIALVOLFRAC: 0.1
+      SCALING_PARAMETER_DEFORMATION: {{ k_j }}
+      SCALING_PARAMETER_PRESSURE: -0.66666666667
+  - MAT: 141
+    MAT_FluidPoroViscosityLawConstant:
+      VALUE: 4e-06
+  - MAT: 3
+    MAT_CNST_ART:
+      VISCOSITY: 4e-06
+      DENS: 1.03e-06
+      YOUNG: 400
+      NUE: 0.5
+      TH: 1.63
+      PEXT1: 0
+      PEXT2: 0
+  - MAT: 4
+    MAT_CNST_ART:
+      VISCOSITY: 1.5e-08
+      DENS: 1e-09
+      YOUNG: 400
+      NUE: 0.5
+      TH: 1.63
+      PEXT1: 0
+      PEXT2: 0
+
+  - MAT: 6
+    MAT_matlist:
+      LOCAL: false
+      NUMMAT: 1
+      MATIDS: [7]
+  - MAT: 7
+    MAT_scatra:
+      DIFFUSIVITY: 17.6
+
+
+  - MAT: 5
+    MAT_matlist:
+      LOCAL: false
+      NUMMAT: 1
+      MATIDS: [301]
+  - MAT: 301
+    MAT_scatra_multiporo_fluid:
+      DIFFUSIVITY: 17.6
+      PHASEID: 0
+
+CLONING MATERIAL MAP:
+  - SRC_FIELD: "structure"
+    SRC_MAT: 2
+    TAR_FIELD: "porofluid"
+    TAR_MAT: 1
+  - SRC_FIELD: "structure"
+    SRC_MAT: 2
+    TAR_FIELD: "scatra"
+    TAR_MAT: 5
+  - SRC_FIELD: "structure"
+    SRC_MAT: 8
+    TAR_FIELD: "porofluid"
+    TAR_MAT: 1
+  - SRC_FIELD: "structure"
+    SRC_MAT: 8
+    TAR_FIELD: "scatra"
+    TAR_MAT: 5
+  - SRC_FIELD: "artery"
+    SRC_MAT: 3
+    TAR_FIELD: "artery_scatra"
+    TAR_MAT: 6
+  - SRC_FIELD: "artery"
+    SRC_MAT: 4
+    TAR_FIELD: "artery_scatra"
+    TAR_MAT: 6
+FUNCT1:
+  - COMPONENT: 0
+    SYMBOLIC_FUNCTION_OF_SPACE_TIME: "0.0"
+  - COMPONENT: 1
+    SYMBOLIC_FUNCTION_OF_SPACE_TIME: "0.65"
+FUNCT2:
+  - COMPONENT: 0
+    SYMBOLIC_FUNCTION_OF_SPACE_TIME: "0.0"
+FUNCT3:
+  - COMPONENT: 0
+    SYMBOLIC_FUNCTION_OF_SPACE_TIME: "0.0"
+FUNCT4:
+  - VARFUNCTION: "0.0"
+FUNCT5:
+  - SYMBOLIC_FUNCTION_OF_SPACE_TIME: "0.7"
+FUNCT6:
+  - SYMBOLIC_FUNCTION_OF_SPACE_TIME: "0.6"
+FUNCT7:
+  - COMPONENT: 0
+    SYMBOLIC_FUNCTION_OF_SPACE_TIME: "0.0"
+FUNCT8:
+  - COMPONENT: 0
+    SYMBOLIC_FUNCTION_OF_SPACE_TIME: "a"
+  - VARIABLE: 0
+    NAME: "a"
+    TYPE: "multifunction"
+    NUMPOINTS: 2
+    TIMES: [0, 100]
+    DESCRIPTION: ["2.5e-1*(1-cos(pi*t*0.4))"]
+DESIGN LINE PORO NEUMANN CONDITIONS:
+  - E: 1
+    NUMDOF: 2
+    ONOFF: [1, 1]
+    VAL: [0, 0]
+    FUNCT: [0, 0]
+  - E: 2
+    NUMDOF: 2
+    ONOFF: [1, 1]
+    VAL: [0, 0]
+    FUNCT: [0, 0]
+  - E: 3
+    NUMDOF: 2
+    ONOFF: [1, 1]
+    VAL: [0, 0]
+    FUNCT: [0, 0]
+  - E: 4
+    NUMDOF: 2
+    ONOFF: [1, 1]
+    VAL: [0, 0]
+    FUNCT: [0, 0]
+DESIGN POINT DIRICH CONDITIONS:
+  - E: 3
+    NUMDOF: 1
+    ONOFF: [1]
+    VAL: [0.7]
+    FUNCT: [0]
+  - E: 6
+    NUMDOF: 1
+    ONOFF: [1]
+    VAL: [0.6]
+    FUNCT: [0]
+  - E: 9
+    NUMDOF: 1
+    ONOFF: [1]
+    VAL: [1]
+    FUNCT: [8]
+  - E: 10
+    NUMDOF: 2
+    ONOFF: [1, 1]
+    VAL: [0, 0]
+    FUNCT: [0, 0]
+DESIGN POINT TRANSPORT DIRICH CONDITIONS:
+  - E: 3
+    NUMDOF: 1
+    ONOFF: [1]
+    VAL: [0.0]
+    FUNCT: [0]
+  - E: 9
+    NUMDOF: 1
+    ONOFF: [1]
+    VAL: [0.0]
+    FUNCT: [0]
+DESIGN SURF TRANSPORT DIRICH CONDITIONS:
+  - E: 1
+    NUMDOF: 1
+    ONOFF: [1]
+    VAL: [0.0]
+    FUNCT: [0]
+DESIGN LINE DIRICH CONDITIONS:
+  - E: 1
+    NUMDOF: 2
+    ONOFF: [0, 1]
+    VAL: [0, 0]
+    FUNCT: [0, 0]
+DESIGN 1D ARTERY/AIRWAY TO POROFLUID NONCONF COUPLING CONDITIONS:
+  - E: 1
+    COUPLING_TYPE: "ARTERY"
+    NUMDOF: 1
+    COUPLEDDOF_REDUCED: [1]
+    COUPLEDDOF_PORO: [2]
+    PENALTY: 1000
+  - E: 2
+    COUPLING_TYPE: "ARTERY"
+    NUMDOF: 1
+    COUPLEDDOF_REDUCED: [1]
+    COUPLEDDOF_PORO: [2]
+    PENALTY: 1000
+  - E: 4
+    COUPLING_TYPE: "ARTERY"
+    NUMDOF: 1
+    COUPLEDDOF_REDUCED: [1]
+    COUPLEDDOF_PORO: [2]
+    PENALTY: 1000
+  - E: 5
+    COUPLING_TYPE: "ARTERY"
+    NUMDOF: 1
+    COUPLEDDOF_REDUCED: [1]
+    COUPLEDDOF_PORO: [2]
+    PENALTY: 1000
+  - E: 7
+    COUPLING_TYPE: "AIRWAY"
+    NUMDOF: 1
+    COUPLEDDOF_REDUCED: [1]
+    COUPLEDDOF_PORO: [1]
+    PENALTY: 100000
+  - E: 8
+    COUPLING_TYPE: "AIRWAY"
+    NUMDOF: 1
+    COUPLEDDOF_REDUCED: [1]
+    COUPLEDDOF_PORO: [1]
+    PENALTY: 100000
+DESIGN 1D ARTERY/AIRWAY TO SCATRA NONCONF COUPLING CONDITIONS:
+  - E: 1
+    COUPLING_TYPE: "ARTERY"
+    NUMDOF: 1
+    COUPLEDDOF_REDUCED: [1]
+    COUPLEDDOF_PORO: [1]
+    PENALTY: 1000
+  - E: 2
+    COUPLING_TYPE: "ARTERY"
+    NUMDOF: 1
+    COUPLEDDOF_REDUCED: [1]
+    COUPLEDDOF_PORO: [1]
+    PENALTY: 1000
+  - E: 4
+    COUPLING_TYPE: "ARTERY"
+    NUMDOF: 1
+    COUPLEDDOF_REDUCED: [1]
+    COUPLEDDOF_PORO: [1]
+    PENALTY: 1000
+  - E: 5
+    COUPLING_TYPE: "ARTERY"
+    NUMDOF: 1
+    COUPLEDDOF_REDUCED: [1]
+    COUPLEDDOF_PORO: [1]
+    PENALTY: 1000
+  - E: 7
+    COUPLING_TYPE: "AIRWAY"
+    NUMDOF: 1
+    COUPLEDDOF_REDUCED: [1]
+    COUPLEDDOF_PORO: [1]
+    PENALTY: 1000
+  - E: 8
+    COUPLING_TYPE: "AIRWAY"
+    NUMDOF: 1
+    COUPLEDDOF_REDUCED: [1]
+    COUPLEDDOF_PORO: [1]
+    PENALTY: 1000
+DESIGN SURF INITIAL FIELD CONDITIONS:
+  - E: 1
+    FIELD: "PoroMultiFluid"
+    FUNCT: 1
+  - E: 1
+    FIELD: "ScaTra"
+    FUNCT: 2
+DESIGN POINT INITIAL FIELD CONDITIONS:
+  - E: 3
+    FIELD: "ScaTra"
+    FUNCT: 3
+  - E: 6
+    FIELD: "ScaTra"
+    FUNCT: 3
+  - E: 9
+    FIELD: "ScaTra"
+    FUNCT: 7
+DESIGN LINE INITIAL FIELD CONDITIONS:
+  - E: 7
+    FIELD: "ScaTra"
+    FUNCT: 7
+  - E: 6
+    FIELD: "ScaTra"
+    FUNCT: 3
+  - E: 6
+    FIELD: "Artery"
+    FUNCT: 6
+  - E: 5
+    FIELD: "ScaTra"
+    FUNCT: 3
+  - E: 5
+    FIELD: "Artery"
+    FUNCT: 5
+INCLUDES:
+  - {{ input_dir }}/poro_geometry_with_arteries.4C.yaml
