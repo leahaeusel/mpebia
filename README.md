@@ -62,9 +62,9 @@ If you use this code or parts of it, please cite the following article:
       title={Multi-Physics-Enhanced Bayesian Inverse Analysis: Information Gain from Additional Fields},
       author={Lea J. Haeusel and Jonas Nitzler and Lea J. Köglmeier and Wolfgang A. Wall},
       year={2025},
-      eprint={TODO},
+      eprint={2510.11095},
       archivePrefix={arXiv},
-      url={https://arxiv.org/abs/TODO},
+      url={https://arxiv.org/abs/2510.11095},
 }
 ```
 
