@@ -15,7 +15,7 @@
 | src/mpebia/porous\_medium\_model/smart\_driver.py     |       50 |        6 |     88% |97, 110, 144, 152, 169-170 |
 | src/mpebia/spacing.py                                 |        4 |        0 |    100% |           |
 | src/mpebia/truncated\_gaussian\_prior.py              |       51 |        0 |    100% |           |
-|                                             **TOTAL** |  **284** |   **21** | **93%** |           |
+| **TOTAL**                                             |  **284** |   **21** | **93%** |           |
 
 
 ## Setup coverage badge
