@@ -22,4 +22,7 @@ class ParametersShared:
     num_grid_points_Eh = 50
     num_grid_points_Ed = num_grid_points_Eh
 
+    # Observation parameters
+    snr_1 = 50
+    snr_2 = 50000
     seed_noise = 38

@@ -25,9 +25,6 @@ pickle_path_ground_truth = (
     directory / ".." / "1_ground_truth" / "mpebia_poro_ground_truth_at_dline.pickle"
 )
 
-snr_1 = 50
-snr_2 = 50000
-
 params = ParametersShared()
 prior = TruncatedNormalPrior(
     params.mean_prior,
@@ -111,8 +108,8 @@ d_gt = data["output"]["result"][0][0]
 d1_gt = d_gt[:, 0]
 d2_gt = d_gt[:, 1]
 v_gt = data["output"]["result"][0][1]
-std_1 = snr_to_std(snr_1, d_gt)  # 0.05
-std_2 = snr_to_std(snr_2, v_gt)  # 0.005
+std_1 = snr_to_std(params.snr_1, d_gt)  # 0.05
+std_2 = snr_to_std(params.snr_2, v_gt)  # 0.005
 num_obs_d = len(d_gt.flatten())
 noise_1 = sample_sobol(num_obs_d, params.seed_noise)
 noise_2 = sample_sobol(len(v_gt), params.seed_noise)
@@ -202,10 +199,45 @@ height_ratios = [4, 4, 4, 5.6, 0.9, 0.9]
 fig, ax = plt.subplots(
     num_rows,
     num_columns,
-    figsize=(11.9, 12.6),
+    figsize=(11.9, 12.8),
     gridspec_kw={"height_ratios": height_ratios, "wspace": 0.55, "hspace": 0.55},
 )
-fig.subplots_adjust(left=0.125, right=0.83, top=0.88, bottom=0.065)
+fig.subplots_adjust(left=0.125, right=0.83, top=0.86, bottom=0.06)
+
+################## Plot number ##################
+pos = np.array([0.5, 1.17])
+ax[0, 2].scatter(
+    pos[0],
+    pos[1],
+    color="k",
+    s=250,
+    marker="o",
+    zorder=10,
+    transform=ax[0, 2].transAxes,
+    clip_on=False,
+)
+ax[0, 2].scatter(
+    pos[0],
+    pos[1],
+    color="w",
+    s=200,
+    marker="o",
+    zorder=11,
+    transform=ax[0, 2].transAxes,
+    clip_on=False,
+)
+ax[0, 2].annotate(
+    r"$\bf{1}$",
+    pos,
+    xytext=pos + (0.005, -0.007),
+    color="k",
+    fontsize=14,
+    ha="center",
+    va="center",
+    zorder=12,
+    xycoords=ax[0, 2].transAxes,
+    textcoords=ax[0, 2].transAxes,
+)
 
 ################## Plot observations ##################
 ax[row_obs_v, col_obs_d_no_blood].axis("off")
@@ -510,7 +542,7 @@ ax[row_contours, 2].legend(bbox_to_anchor=(1.15, -0.14), loc="lower left")
 # Calculate the centered x-coordinate of each column
 x_center_col1 = positions[0][0] + width_left_box / 4
 x_center_col2 = positions[0][0] + width_left_box * 3 / 4
-y_center = get_axis_bbox(ax[0, 0], fig).y1 + 0.06
+y_center = get_axis_bbox(ax[0, 0], fig).y1 + 0.08
 # Loop over labels
 positions_x = [x_center_col1, x_center_col2]
 upper_labels = [

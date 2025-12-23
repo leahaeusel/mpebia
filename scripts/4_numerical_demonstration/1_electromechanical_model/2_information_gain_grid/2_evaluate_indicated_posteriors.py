@@ -2,7 +2,6 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy as sp
 
 import mpebia.plotting.rc_params  # pylint: disable=unused-import
 from mpebia.electromechanical_model.cube_model import CubeModel
@@ -87,6 +86,8 @@ snrs_plot_post = [
     params.snrs_I[0],
 ]
 posteriors_to_plot = []
+log_likelihood_d_to_plot = []
+log_likelihood_I_to_plot = []
 for num_obs_I, snr_I in zip(nums_obs_plot_post, snrs_plot_post):
     # Generate observations
     i_obs_I = get_equidistant_indices(num_obs_I, len(F_gt))
@@ -117,12 +118,18 @@ for num_obs_I, snr_I in zip(nums_obs_plot_post, snrs_plot_post):
     logger.info(f"RIIG at {num_obs_I} observations and SNR {snr_I}: {riig}")
 
     posteriors_to_plot.append(posterior_mp)
+    log_likelihood_d_to_plot.append(log_likelihood_grid_d)
+    log_likelihood_I_to_plot.append(log_likelihood_grid_I)
 
 posteriors_to_plot = np.array(posteriors_to_plot)
+log_likelihood_d_to_plot = np.array(log_likelihood_d_to_plot)
+log_likelihood_I_to_plot = np.array(log_likelihood_I_to_plot)
 
 np.savez_compressed(
     directory / "data_indicated_posteriors",
     nums_obs_plot_post=nums_obs_plot_post,
     snrs_plot_post=snrs_plot_post,
     posteriors_to_plot=posteriors_to_plot,
+    log_likelihood_d_to_plot=log_likelihood_d_to_plot,
+    log_likelihood_I_to_plot=log_likelihood_I_to_plot,
 )

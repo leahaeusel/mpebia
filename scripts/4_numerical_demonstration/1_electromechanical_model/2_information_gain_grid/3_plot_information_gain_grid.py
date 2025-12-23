@@ -9,6 +9,7 @@ from mpebia.electromechanical_model.parameters_riig_grid import ParametersRIIGGr
 from mpebia.electromechanical_model.parameters_shared import ParametersShared
 from mpebia.output import get_directory
 from mpebia.plotting import colors
+from mpebia.plotting.positioning import get_axis_bbox
 from mpebia.plotting.style import arrowprops
 from mpebia.truncated_gaussian_prior import TruncatedNormalPrior
 
@@ -44,36 +45,52 @@ F_obs_I_grid = data["F_obs_I_grid"]
 d_obs = data["d_obs"]
 I_obs_grid = data["I_obs_grid"]
 all_noise = data["all_noise"]
-log_likelihood_grid_d = data["log_likelihood_grid_d"]
 log_prior_grid = data["log_prior_grid"]
 
 data_indicated_posteriors = np.load(directory / "data_indicated_posteriors.npz", allow_pickle=True)
 nums_obs_plot_post = data_indicated_posteriors["nums_obs_plot_post"]
 snrs_plot_post = data_indicated_posteriors["snrs_plot_post"]
+log_likelihood_d_to_plot = data_indicated_posteriors["log_likelihood_d_to_plot"]
+log_likelihood_I_to_plot = data_indicated_posteriors["log_likelihood_I_to_plot"]
 posteriors_to_plot = data_indicated_posteriors["posteriors_to_plot"]
+
+likelihood_d_to_plot = np.exp(
+    log_likelihood_d_to_plot
+    - np.max(log_likelihood_d_to_plot, axis=(1, 2))[:, np.newaxis, np.newaxis]
+)
+likelihood_I_to_plot = np.exp(
+    log_likelihood_I_to_plot
+    - np.max(log_likelihood_I_to_plot, axis=(1, 2))[:, np.newaxis, np.newaxis]
+)
 
 # PLOTTING
 
 fontsize_marker = 14
 
-fig = plt.figure(figsize=(11.9, 6.4))
+fig = plt.figure(figsize=(11.9, 14.5))
+num_rows = 7
+num_cols = 7
+width_ratio_gap = 0.53
 gs = GridSpec(
-    5,
-    5,
-    height_ratios=[0.08, 0.73, 0.65, 0.8, 0.3],
-    width_ratios=[2.25, 0.6, 0.85, 0.6, 0.85],
+    num_rows,
+    num_cols,
+    height_ratios=[1, 0.35, 0.4, 0.2, 0.4, 0.2, 0.4],
+    width_ratios=[1, width_ratio_gap, 1, width_ratio_gap, 1, width_ratio_gap, 1],
     wspace=0.0,
     hspace=0.0,
-    left=0.05,
-    right=0.99,
-    top=0.895,
-    bottom=0.0,
+    left=0.14,
+    right=0.978,
+    top=0.934,
+    bottom=0.05,
 )
 
 ######### PLOT RIIG GRID #########
 
 # Plot RIIG grid
-ax_riig = fig.add_subplot(gs[1:4, 0])
+row_riig = 0
+col_riig_start = 0
+col_riig_end = num_cols - 1
+ax_riig = fig.add_subplot(gs[row_riig, col_riig_start:col_riig_end])
 contour_ig = ax_riig.contourf(
     nums_obs_I,
     snrs_I,
@@ -95,14 +112,18 @@ ax_riig.set_aspect("equal", "box")
 # Add colorbar
 points_riig = ax_riig.get_position().get_points()
 width_riig = points_riig[1, 0] - points_riig[0, 0]
-cbar_ax = fig.add_axes([points_riig[0, 0], points_riig[1, 1] + 0.02, width_riig, 0.04])
-fig.colorbar(
+height_cbar_riig = width_riig / 24
+cbar_ax = fig.add_axes([points_riig[0, 0], points_riig[1, 1] + 0.01, width_riig, height_cbar_riig])
+cbar = fig.colorbar(
     contour_ig,
     cax=cbar_ax,
-    label=r"Relative increase in information gain $\text{RIIG}\!\left( \boldsymbol{y}_{1, \text{obs}}, \boldsymbol{y}_{2, \text{obs}} \right)$ [\hspace{1pt}-\hspace{1pt}]",
     location="top",
 )
-
+cbar.set_label(
+    r"\textbf{Relative increase in information gain} $\text{RIIG}\!\left( \boldsymbol{y}_{1, \text{obs}}, \boldsymbol{y}_{2, \text{obs}} \right)$ [\hspace{1pt}-\hspace{1pt}]",
+    fontsize=16,
+    labelpad=12,
+)
 # Indicate points where posterior is plotted on the right
 for i, (num_obs, snr) in enumerate(zip(nums_obs_plot_post, snrs_plot_post)):
     ax_riig.scatter(num_obs, snr, color="k", s=250, marker="o", zorder=10)
@@ -117,62 +138,88 @@ for i, (num_obs, snr) in enumerate(zip(nums_obs_plot_post, snrs_plot_post)):
         zorder=12,
     )
 
-######### PLOT POSTERIORS #########
-axes_post = [fig.add_subplot(gs[0:2, 2]), fig.add_subplot(gs[3:4, 4]), fig.add_subplot(gs[0:2, 4])]
-for i, (ax_post, posterior) in enumerate(zip(axes_post, posteriors_to_plot)):
-    col = i + 1
-    row_points = 0
-    row_obs = 1
-    row_post = 2
+######### PLOT PRIORS, LIKELIHOODS, AND POSTERIORS #########
+col_prior = 0
+col_liked = 2
+col_likeI = 4
+col_post = 6
+cols = [col_prior, col_liked, col_likeI, col_post]
+rows = [2, 4, 6]
+distrs_to_plot = [
+    3 * [np.exp(log_prior_grid)],
+    likelihood_d_to_plot,
+    likelihood_I_to_plot,
+    posteriors_to_plot,
+]
+axes_distr = np.empty((len(rows), len(cols)), dtype=object)
+for j, (col, distrs) in enumerate(zip(cols, distrs_to_plot)):
+    for i, (row, distr) in enumerate(zip(rows, distrs)):
+        ax_distr = fig.add_subplot(gs[row, col])
+        axes_distr[i, j] = ax_distr
 
-    # Add posteriors
-    contour = ax_post.contourf(
-        prior.grid_points_1 / 1000,
-        prior.grid_points_2,
-        posterior.T,
-        6,
-        cmap=colors.CMAP,
-    )
-    ax_post.set_xlabel(r"$x_1 = E$ [kPa]")
-    ax_post.set_ylabel(r"$x_2 = \nu$ [\hspace{1pt}-\hspace{1pt}]")
-    ax_post.grid(True)
-    ax_post.set_xlim(9, 13)
-    ax_post.set_ylim(0.15, np.max(prior.grid_points_2))
-    ax_post.set_xticks(np.arange(9, 14, 1))
+        # Add contour plot of the distribution
+        contour = ax_distr.contourf(
+            prior.grid_points_1 / 1000,
+            prior.grid_points_2,
+            distr.T,
+            6,
+            cmap=colors.CMAP,
+        )
+        ax_distr.set_xlabel(r"$x_1 = E$ [kPa]")
+        ax_distr.set_ylabel(r"$x_2 = \nu$ [\hspace{1pt}-\hspace{1pt}]")
+        ax_distr.grid(True)
+        ax_distr.set_xlim(9, 13)
+        ax_distr.set_ylim(0.15, np.max(prior.grid_points_2))
+        ax_distr.set_xticks(np.arange(9, 14, 1))
 
-    # Add numbers
-    pos = np.array([0.5, 1.12])
-    ax_post.scatter(
-        pos[0],
-        pos[1],
-        color="k",
-        s=250,
-        marker="o",
-        zorder=10,
-        transform=ax_post.transAxes,
-        clip_on=False,
-    )
-    ax_post.scatter(
-        pos[0],
-        pos[1],
-        color="w",
-        s=200,
-        marker="o",
-        zorder=11,
-        transform=ax_post.transAxes,
-        clip_on=False,
-    )
-    ax_post.annotate(
-        r"$\bf{" + str(i + 1) + r"}$",
-        (11, 0.5),
-        xytext=pos + (0.005, -0.007),
-        color="k",
-        fontsize=fontsize_marker,
-        ha="center",
-        va="center",
-        zorder=12,
-        textcoords=ax_post.transAxes,
-    )
+        # Add numbers
+        if col == col_prior:
+            pos_number = np.array([-0.55, 0.36])
+            ax_distr.scatter(
+                pos_number[0],
+                pos_number[1],
+                color="k",
+                s=250,
+                marker="o",
+                zorder=10,
+                transform=ax_distr.transAxes,
+                clip_on=False,
+            )
+            ax_distr.scatter(
+                pos_number[0],
+                pos_number[1],
+                color="w",
+                s=200,
+                marker="o",
+                zorder=11,
+                transform=ax_distr.transAxes,
+                clip_on=False,
+            )
+            ax_distr.annotate(
+                r"$\bf{" + str(i + 1) + r"}$",
+                (11, 0.5),
+                xytext=pos_number + (0.005, -0.007),
+                color="k",
+                fontsize=fontsize_marker,
+                ha="center",
+                va="center",
+                zorder=12,
+                textcoords=ax_distr.transAxes,
+            )
+
+        # Add column titles
+        if row == rows[0]:
+            if col == col_prior:
+                title = r"Prior"
+            elif col == col_liked:
+                title = r"First-field likelihood"
+            elif col == col_likeI:
+                title = r"Second-field likelihood"
+            elif col == col_post:
+                title = r"Posterior"
+            else:
+                raise ValueError("Invalid column.")
+            ax_distr.set_title(title, fontsize=16, pad=30)
 
 ######### ADD ARROWS #########
 
@@ -190,42 +237,94 @@ ax_riig.annotate(
     arrowprops=arrowprops,
 )
 
-# Add arrows to posterior plots
-# - horizontal arrow
-ax_arrow1 = fig.add_subplot(gs[0:2, 3])
-ax_arrow1.axis("off")
-ax_arrow1.annotate(
-    "",
-    xy=(1, 0.5),
-    xytext=(0, 0.5),
-    arrowprops=arrowprops,
-)
-ax_arrow1.set_xlim(-0.15, 2.15)
-# - vertical arrow
-ax_arrow2 = fig.add_subplot(gs[2, 4])
-ax_arrow2.axis("off")
-ax_arrow2.annotate(
-    "",
-    xy=(0.5, 1),
-    xytext=(0.5, 0),
-    arrowprops=arrowprops,
-)
-ax_arrow2.set_ylim(-0.8, 2.0)
+######## ADD COLORED BOXES ########
 
-# Add posteriors title
-axes_post[0].annotate(
-    r"Posterior densities $p(\boldsymbol{x} | \boldsymbol{y}_{1, \text{obs}}, \boldsymbol{y}_{2, \text{obs}})$ at indicated $N_{\text{obs}, 2}$"
-    r" and $\text{SNR}_2$:",
-    xy=(-0.0, 1.35),
-    fontsize=12,
-    ha="left",
-    va="top",
-    xycoords=axes_post[0].transAxes,
-    textcoords=axes_post[0].transAxes,
-)
+pad = 0.01
+width_primary_label = 0.03
+width_secondary_label = 0.037
+linewidth = 5
 
+# Get column positions
+pos_row0col0 = get_axis_bbox(axes_distr[0, 0], fig)
+pos_row1col0 = get_axis_bbox(axes_distr[1, 0], fig)
+pos_row2col0 = get_axis_bbox(axes_distr[2, 0], fig)
+pos_row0col3 = get_axis_bbox(axes_distr[0, 3], fig)
+pos_row2col3 = get_axis_bbox(axes_distr[2, 3], fig)
+y_center_rows01 = (pos_row0col0.y0 + pos_row1col0.y1) / 2
+y_center_rows12 = (pos_row1col0.y0 + pos_row2col0.y1) / 2
+offset_box_left = pad + width_secondary_label
+width_box = pos_row0col3.x1 - pos_row0col0.x0 + pad + offset_box_left
+height_box = y_center_rows12 - y_center_rows01
+
+positions = [
+    (pos_row0col0.x0 - offset_box_left, y_center_rows01 - height_box),
+    (pos_row0col0.x0 - offset_box_left, y_center_rows01),
+    (pos_row0col0.x0 - offset_box_left, y_center_rows12),
+]
+color_frame = colors.MULTIPHYSICS_LIGHT
+zorder = -1000
+
+for i, pos in enumerate(positions):
+    # frame
+    fig.patches.append(
+        plt.Rectangle(
+            pos,
+            width_box,
+            height_box,
+            fill=False,
+            edgecolor=color_frame,
+            linewidth=linewidth,
+            transform=fig.transFigure,
+            figure=fig,
+            zorder=zorder,
+        )
+    )
+
+    # background for primary label
+    fig.patches.append(
+        plt.Rectangle(
+            (pos[0], pos[1]),
+            width_primary_label,
+            height_box,
+            fill=True,
+            facecolor=color_frame,
+            edgecolor=color_frame,
+            linewidth=linewidth,
+            transform=fig.transFigure,
+            figure=fig,
+            zorder=zorder,
+        )
+    )
+
+    # background for secondary label
+    fig.patches.append(
+        plt.Rectangle(
+            (pos[0] + width_primary_label, pos[1]),
+            width_secondary_label,
+            height_box,
+            fill=True,
+            facecolor=colors.MULTIPHYSICS_LIGHTER,
+            edgecolor=None,
+            linewidth=linewidth,
+            transform=fig.transFigure,
+            figure=fig,
+            zorder=zorder - 1,
+        )
+    )
+
+# Add primary label
+fig.text(
+    positions[1][0] + (width_primary_label / 2),
+    positions[1][1] + height_box / 2,
+    r"\textbf{Multi-physics BIA}",
+    verticalalignment="center",
+    horizontalalignment="center",
+    fontsize=16,
+    weight="bold",
+    rotation="vertical",
+)
 
 plt.savefig(directory / "riig_grid_with_posteriors.png")
 
 
-print(np.max(relative_information_gain_grid))
+print(f"Max. RIIG: {np.max(relative_information_gain_grid)}")

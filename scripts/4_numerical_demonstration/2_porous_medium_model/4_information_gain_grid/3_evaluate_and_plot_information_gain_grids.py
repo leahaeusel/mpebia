@@ -310,15 +310,15 @@ relative_increase_information_gain_vary_snr1_snr2 = relative_increase_in_informa
 # PLOTTING
 
 fig = plt.figure(
-    figsize=(11.9, 11.0),
+    figsize=(11.9, 10.0),
 )
 offset = 0.015
 gs = GridSpec(
     2,
     3,
-    height_ratios=[1.0, 1.8],
+    height_ratios=[1.0, 1.9],
     hspace=0.35,
-    wspace=0.3,
+    wspace=0.55,
     left=0.05,
     right=0.985,
     top=0.99,
@@ -346,6 +346,7 @@ contour_kwargs = dict(
     cmap=colors.CMAP,
     vmin=riig_min,
     vmax=riig_max,
+    zorder=1,
 )
 logger.info("Min. RIIG: %f", riig_min)
 logger.info("Max. RIIG: %f", riig_max)
@@ -403,6 +404,64 @@ ax_3d.contourf(
     alpha=alpha,
     **contour_kwargs,
 )
+
+pos_ax_3d = ax_3d.get_position()
+ax_2d = fig.add_axes(pos_ax_3d, frameon=False)
+ax_2d.set_facecolor("none")
+ax_2d.axis("off")
+
+pos_number = np.array((0.619, 0.425))
+ax_2d.scatter(
+    pos_number[0],
+    pos_number[1],
+    color="k",
+    s=250,
+    marker="o",
+    zorder=10,
+    transform=ax_2d.transAxes,
+)
+ax_2d.scatter(
+    pos_number[0],
+    pos_number[1],
+    color="w",
+    s=200,
+    marker="o",
+    zorder=11,
+    transform=ax_2d.transAxes,
+)
+ax_2d.annotate(
+    r"$\bf{1}$",
+    (0, 0),
+    xytext=pos_number + (0.004, -0.004),
+    color="k",
+    fontsize=14,
+    ha="center",
+    va="center",
+    zorder=100,
+    xycoords=ax_2d.transAxes,
+    textcoords=ax_2d.transAxes,
+)
+
+# Plot orthogonal lines from the evaluation point to each plane
+ax_3d.plot(
+    [params.k_j, params.k_j],
+    [np.log(params.snr_2), np.log(params_riig.fixed_snr_2)],
+    [np.log(params.snr_1), np.log(params.snr_1)],
+    color="k",
+    linestyle="--",
+    linewidth=1.5,
+    zorder=99,
+)
+ax_3d.plot(
+    [params.k_j, params.k_j],
+    [np.log(params.snr_2), np.log(params.snr_2)],
+    [np.log(params.snr_1), np.log(params_riig.fixed_snr_1)],
+    color="k",
+    linestyle="--",
+    linewidth=1.5,
+    zorder=99,
+)
+
 ax_3d.set_xbound((np.min(kjs_obs), np.max(kjs_obs)))
 ax_3d.set_ybound((np.min(snr2_mesh), np.max(snr2_mesh)))
 ax_3d.set_zbound((np.min(snr1_mesh), np.max(snr1_mesh)))
@@ -419,25 +478,25 @@ ax_3d.set_zticks(snr_ticks, labels=[f"$10^{exp}$" for exp in snr_exponents])
 arrow_kwargs = get_arrow_kwargs(ax=None)
 label_kwargs = get_label_kwargs(ax=None, fontsize=14)
 pos_arrows = (
-    (-0.09, 0.0, -0.08, -0.11),
+    (-0.098, -0.008, -0.076, -0.106),  # x tip, x tail, y tip, y tail
     (0.115, 0.112, 0.045, -0.03),
     (0.111, 0.061, -0.04, -0.092),
 )
-for x1, x2, y1, y2 in pos_arrows:
+for x1, x_2d, y1, y_2d in pos_arrows:
     ax_3d.annotate(
         "",
         xy=(x1, y1),  # tip
-        xytext=(x2, y2),
+        xytext=(x_2d, y_2d),
         **arrow_kwargs,
     )
-x1, x2, x3 = -0.055, 0.153, 0.121
-y1, y2, y3 = -0.103, 0.015, -0.067
+x1, x_2d, x3 = -0.065, 0.153, 0.121
+y1, y_2d, y3 = -0.10, 0.015, -0.067
 pos_labels = (
     (x1, y1),
     (x1, y1 - 0.008),
-    (x2, y2),
-    (x2, y2 - 0.008),
-    (x2, y2 - 0.016),
+    (x_2d, y_2d),
+    (x_2d, y_2d - 0.008),
+    (x_2d, y_2d - 0.016),
     (x3, y3),
     (x3, y3 - 0.008),
     (x3, y3 - 0.016),
@@ -464,12 +523,15 @@ for pos_label, label in zip(pos_labels, labels):
 pos_riig = axes_riig[1].get_position()
 bbox_riig = get_axis_bbox(axes_riig[1], fig)
 width_riig = pos_riig.x1 - pos_riig.x0
-cbar_ax = fig.add_axes([pos_riig.x0, bbox_riig.y0 - 0.05, width_riig, 0.02])
-fig.colorbar(
+cbar_ax = fig.add_axes([pos_riig.x0, bbox_riig.y0 - 0.1, width_riig, 0.02])
+cbar = fig.colorbar(
     contours[1],
     cax=cbar_ax,
-    label=r"Relative increase in information gain $\text{RIIG}\!\left( \boldsymbol{y}_{1, \text{obs}}, \boldsymbol{y}_{2, \text{obs}} \right)$ [\hspace{1pt}-\hspace{1pt}]",
-    location="bottom",
+    location="top",
+)
+cbar.set_label(
+    label=r"\textbf{Relative increase in information gain} $\text{RIIG}\!\left( \boldsymbol{y}_{1, \text{obs}}, \boldsymbol{y}_{2, \text{obs}} \right)$ [\hspace{1pt}-\hspace{1pt}]",
+    fontsize=16,
 )
 
 plt.savefig(directory / "riig_grids.png")
