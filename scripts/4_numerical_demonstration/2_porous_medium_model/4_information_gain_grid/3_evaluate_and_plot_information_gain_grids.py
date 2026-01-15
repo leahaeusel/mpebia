@@ -1,4 +1,4 @@
-"""Evaluate the multi-physics information gain on a grid."""
+"""Evaluate and plot the relative increase in information gain on a grid."""
 
 import matplotlib.pyplot as plt
 import numpy as np

@@ -1,4 +1,4 @@
-"""Evaluate the multi-physics information gain on a grid."""
+"""Evaluate posteriors at indicated SNRs and #observations."""
 
 import matplotlib.pyplot as plt
 import numpy as np

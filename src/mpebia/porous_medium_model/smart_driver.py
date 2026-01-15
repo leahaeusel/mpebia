@@ -1,4 +1,4 @@
-"""Driver to recycle the model evaluations from a previous QUEENS run."""
+"""Driver to smartly reuse the model evaluations from a previous QUEENS run."""
 
 import logging
 import os
@@ -14,19 +14,22 @@ _logger = logging.getLogger(__name__)
 
 
 class SmartDriver(Jobscript):
-    """Driver to recycle the model evaluations from a previous QUEENS run.
+    """Driver to smartly reuse model evaluations from a previous QUEENS grun.
+
+    If the output files already exist and the input parameters are the same, the existing output files are reused instead of running the simulation again.
+    If the output files do not exist, the simulation is run as usual.
 
     Attributes:
-        input_template (Path): Read in simulation input template as string
+        input_template (Path): Read-in simulation input template as string
         data_processor (obj): Instance of data processor class
         gradient_data_processor (obj): Instance of data processor class for gradient data
-        jobscript_template (str): Read in jobscript template as string
+        jobscript_template (str): Read-in jobscript template as string
         jobscript_options (dict): Dictionary containing jobscript options
         jobscript_file_name (str): Jobscript file name (default: 'jobscript.sh')
         raise_error_on_jobscript_failure (bool): Whether to raise an error for a non-zero jobscript
-                                                 exit code. If False, a warning is logged instead.
+            exit code. If False, a warning is logged instead.
         reuse_existing_jobs (bool): Whether to reuse existing jobs if the output files already exist
-                                    and the input parameters are the same.
+            and the input parameters are the same.
     """
 
     @log_init_args
@@ -50,7 +53,7 @@ class SmartDriver(Jobscript):
             parameters (Parameters): Parameters object.
             input_templates (str, Path, dict): Path(s) to simulation input template.
             jobscript_template (str, Path): Path to jobscript template or read-in jobscript
-                                            template.
+                template.
             executable (str, Path): Path to main executable of respective software.
             files_to_copy (list, opt): Files or directories to copy to experiment_dir.
             data_processor (obj, opt): Instance of data processor class.
@@ -58,9 +61,9 @@ class SmartDriver(Jobscript):
             jobscript_file_name (str, opt): Jobscript file name (default: 'jobscript.sh').
             extra_options (dict, opt): Extra options to inject into jobscript template.
             raise_error_on_jobscript_failure (bool, opt): Whether to raise an error for a non-zero
-                                                          jobscript exit code.
+                jobscript exit code.
             reuse_existing_jobs (bool, opt): Whether to reuse existing jobs if the output files
-                                             already exist and the input parameters are the same.
+                already exist and the input parameters are the same.
         """
         super().__init__(
             parameters=parameters,

@@ -14,14 +14,14 @@ class RecycleDriver(Jobscript):
     """Driver to recycle the model evaluations from a previous QUEENS run.
 
     Attributes:
-        input_template (Path): Read in simulation input template as string
+        input_template (Path): Read-in simulation input template as string
         data_processor (obj): Instance of data processor class
         gradient_data_processor (obj): Instance of data processor class for gradient data
-        jobscript_template (str): Read in jobscript template as string
+        jobscript_template (str): Read-in jobscript template as string
         jobscript_options (dict): Dictionary containing jobscript options
         jobscript_file_name (str): Jobscript file name (default: 'jobscript.sh')
         raise_error_on_jobscript_failure (bool): Whether to raise an error for a non-zero jobscript
-                                                 exit code.
+            exit code.
     """
 
     @log_init_args
@@ -49,7 +49,7 @@ class RecycleDriver(Jobscript):
         """Run the driver.
 
         Args:
-            sample (dict): Sample for which to run the driver
+            sample (dict): Input sample for which to run the driver
             job_id (int): Job ID
             num_procs (int): Number of processors
             experiment_dir (Path): Path to QUEENS experiment directory

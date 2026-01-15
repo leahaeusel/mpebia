@@ -1,10 +1,10 @@
-"""Parameters that both setups share."""
+"""Parameters that both demonstration examples share."""
 
 import numpy as np
 
 
 class ParametersShared:
-    """Wrapper for shared parameters."""
+    """Wrapper for parameters that both demonstration examples share."""
 
     # Ground truth input parameters
     young_h_gt = 6.0

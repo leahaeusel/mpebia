@@ -13,7 +13,7 @@ METADATA_FILETYPE = ".yaml"
 class RecycleMetadata(SimulationMetadata):
     """Simulation metadata object for use with RecycleDriver.
 
-    This objects holds metadata, times code sections and exports them to yaml.
+    This objects holds metadata and times code sections and exports them to yaml.
 
     Attributes:
         job_id (int): Id of the job
@@ -53,13 +53,13 @@ def get_metadata_from_job_dir(job_dir, metadata_filename=DEFAULT_METADATA_FILENA
 
 
 def get_metadata_from_experiment_dir(experiment_dir, metadata_filename=DEFAULT_METADATA_FILENAME):
-    """Get metadata from experiment_dir.
+    """Get metadata from experiment directory.
 
     To keep memory usage limited, this is implemented as a generator.
 
     Args:
         experiment_dir (pathlib.Path, str): Path with the job dirs
-        metadata_filename (str, opt): Name of the metadata file
+        metadata_filename (str, optional): Name of the metadata file
 
     Yields:
         metadata (dict): metadata of a job

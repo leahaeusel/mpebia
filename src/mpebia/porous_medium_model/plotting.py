@@ -1,4 +1,4 @@
-"""Utility functions for information gain calculations."""
+"""Utility functions for plotting."""
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,7 +8,13 @@ from mpebia.plotting import colors
 
 
 def plot_observations_d(d_gt, d_obs, path):
-    """Plot displacement observations and ground truth values."""
+    """Plot displacement observations and ground truth values.
+
+    Args:
+        d_gt (np.array): Ground truth displacements.
+        d_obs (np.array): Observed displacements.
+        path (str, Path): Path to save the figure.
+    """
     x_d = np.array(range(len(d_obs) // 2)) + 1
 
     _, ax = plt.subplots(2, figsize=(6, 8))
@@ -40,7 +46,13 @@ def plot_observations_d(d_gt, d_obs, path):
 
 
 def plot_observations_v(v_gt, v_obs, path):
-    """Plot blood volume fraction observations and ground truth values."""
+    """Plot blood volume fraction observations and ground truth values.
+
+    Args:
+        v_gt (np.array): Ground truth blood volume fractions.
+        v_obs (np.array): Observed blood volume fractions.
+        path (str, Path): Path to save the figure.
+    """
     x_v = np.array(range(len(v_obs))) + 1
 
     _, ax = plt.subplots(figsize=(6, 4))
@@ -59,7 +71,14 @@ def plot_observations_v(v_gt, v_obs, path):
 
 
 def plot_posterior(Ehs, Eds, posterior, path):
-    """Plot blood volume fraction observations and ground truth values."""
+    """Plot blood volume fraction observations and ground truth values.
+
+    Args:
+        Ehs (np.array): Grid points for Young's modulus of the healthy tissue.
+        Eds (np.array): Grid points for Young's modulus of the diseased tissue.
+        posterior (np.array): Posterior values on the grid.
+        path (str, Path): Path to save the figure.
+    """
     fig, ax = plt.subplots(figsize=(6, 4))
 
     contour = ax.contourf(Ehs, Eds, posterior.T, 6, cmap=colors.CMAP)

@@ -1,4 +1,4 @@
-"""Class for Bayesian inference on the cube model."""
+"""Class for a truncated normal distribution used as prior."""
 
 import logging
 
@@ -16,8 +16,8 @@ class TruncatedNormalPrior:
     """A two-dimensional truncated normal distribution that is used as prior.
 
     Attributes:
-        prior_1 (np.stats.truncnorm): Truncated normal distribution for the first dimension.
-        prior_2 (np.stats.truncnorm): Truncated normal distribution for the second dimension.
+        prior_1 (sp.stats.truncnorm): Truncated normal distribution for the first dimension.
+        prior_2 (sp.stats.truncnorm): Truncated normal distribution for the second dimension.
         grid_points_1 (np.ndarray): Grid points in first dimension of shape(num_grid_points_1,)
         grid_points_2 (np.ndarray): Grid points in second dimension of shape(num_grid_points_2,)
         offset_ppf (float): Offset of the first and last grid point with respect to the percent
@@ -73,7 +73,7 @@ class TruncatedNormalPrior:
             truncations (list): List of truncation values. Has length 2.
 
         Returns:
-            np.stats.truncnorm: A truncated normal distribution object.
+            sp.stats.truncnorm: A truncated normal distribution object.
         """
         a, b = (truncations - mean) / std
         prior = sp.stats.truncnorm(a, b, loc=mean, scale=std)
@@ -116,7 +116,15 @@ class TruncatedNormalPrior:
     def plot_prior_and_grid_points(
         self, prior_grid, true_params, directory, scale_dim1=1.0, scale_dim2=1.0
     ):
-        """Plot and save the prior distribution and the grid points."""
+        """Plot and save the prior distribution and the grid points.
+
+        Args:
+            prior_grid (np.ndarray): Array of prior values on the grid.
+            true_params (list): List of true parameter values. Has length 2.
+            directory (Path): Directory to save the plot.
+            scale_dim1 (float, opt): Scaling factor for the first dimension in the plot.
+            scale_dim2 (float, opt): Scaling factor for the second dimension in the plot.
+        """
         fig, ax = plt.subplots()
         contour = ax.contourf(
             self.grid_points_1 * scale_dim1,

@@ -1,4 +1,4 @@
-"""Utilities for outputting data to files."""
+"""Utility functions for outputting data to files."""
 
 from pathlib import Path
 

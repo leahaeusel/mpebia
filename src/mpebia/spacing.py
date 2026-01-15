@@ -1,4 +1,4 @@
-"""Utilities for outputting data to files."""
+"""Utility functions for generating spaced points."""
 
 import numpy as np
 

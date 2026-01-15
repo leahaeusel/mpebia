@@ -1,4 +1,4 @@
-"""Driver to recycle the model evaluations from a previous QUEENS run."""
+"""Extended grid iterator to evaluate the porous medium model posteriors."""
 
 import logging
 from importlib.metadata import distribution
@@ -11,10 +11,11 @@ _logger = logging.getLogger(__name__)
 
 
 class PoroGridIterator(Grid):
-    """Grid Iterator to evaluate the poro model posteriors.
+    """Grid Iterator to evaluate the porous medium model posteriors.
 
-    Enables evaluation of the poro model on a grid that is evenly spaced
-    with respect to the cumulative distribution function of the prior.
+    Enables evaluation of the porous medium model on a grid that is
+    evenly spaced with respect to the cumulative distribution function
+    of the prior.
     """
 
     def pre_run(self):

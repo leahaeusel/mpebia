@@ -9,11 +9,10 @@ class CubeModel:
     """Tensile test of a cube with concurrent electric current measurements.
 
     The cube is assumed clamped on one side while a force is applied to the opposing side.
+    At the same time, these opposing sides are subjected to different potentials and the resulting
+    electrical current is measured.
     The lateral surfaces of the cube are free to move in one direction and clamped in the other
     direction.
-
-    At the same time, the opposing sides are subjected to different
-    potentials and the resulting electrical current is measured.
 
     Attributes:
         l0 (float): Initial side lengths of the cube.
@@ -74,7 +73,7 @@ class CubeModel:
         Args:
             F (float): Applied force.
             y (np.ndarray): Current solution vector of length 2. Consists of the displacement d and
-                            the electric current I.
+                the electric current I.
 
         Returns:
             np.array: 2x2 system matrix A.
@@ -100,7 +99,7 @@ class CubeModel:
         Args:
             F (float): Applied force.
             y (np.ndarray): Current solution vector of length 2. Consists of the displacement d and
-                            the electric current I.
+                the electric current I.
 
         Returns:
             np.ndarray: Right-hand side vector of length 2.
@@ -174,7 +173,17 @@ class CubeModel:
         return ds, Is
 
     def solve_on_grid(self, grid_points_E, grid_points_nu, F_obs, index_sol):
-        """Solve the cube model on a grid."""
+        """Solve the cube model on a grid.
+
+        Args:
+            grid_points_E (np.ndarray): Grid points for Young's modulus.
+            grid_points_nu (np.ndarray): Grid points for Poisson's ratio.
+            F_obs (np.ndarray): The forces at which observations were made.
+            index_sol (int): The index within the solution vector at which to return the solution.
+
+        Returns:
+            np.ndarray: The solution on the grid.
+        """
         solution_on_grid = np.zeros((len(grid_points_E), len(grid_points_nu), len(F_obs)))
         for i_E, E in enumerate(grid_points_E):
             for i_nu, nu in enumerate(grid_points_nu):

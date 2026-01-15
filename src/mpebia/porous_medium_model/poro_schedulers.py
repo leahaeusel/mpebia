@@ -1,4 +1,4 @@
-"""QUEENS schedulers for porous medium model."""
+"""Extended schedulers for the porous medium model."""
 
 import logging
 import time
@@ -15,18 +15,18 @@ _logger = logging.getLogger(__name__)
 
 
 class PoroDaskScheduler(Dask):
-    """Dask scheduler for porous medium model in QUEENS."""
+    """Dask scheduler for porous medium model."""
 
     def evaluate(self, samples, driver, job_ids=None):
         """Submit jobs to driver.
 
         Args:
-            samples (np.array): Array of samples
+            samples (np.array): Array of input samples
             driver (Driver): Driver object that runs simulation
-            job_ids (lst, opt): List of job IDs corresponding to samples
+            job_ids (list, optional): List of job IDs corresponding to samples
 
         Returns:
-            result_dict (dict): Dictionary containing results
+            dict: Dictionary containing results
         """
         if self.restart_workers:
             # This is necessary, because the subprocess in the driver does not get killed

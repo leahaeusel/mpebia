@@ -1,4 +1,4 @@
-"""Utility functions related to entropy."""
+"""Utility functions for entropy, KL divergence, and information gain."""
 
 import numpy as np
 
@@ -83,7 +83,22 @@ def information_gain_2d(
     grid_points_second_dim,
     return_posterior=False,
 ):
-    """Compute the information gain employing the log-sum-exp trick."""
+    """Compute the information gain employing the log-sum-exp trick.
+
+    Args:
+        log_likelihood_grid (np.ndarray): Log-likelihood values on the grid.
+        log_prior_grid (np.ndarray): Log-prior values on the grid.
+        grid_points_first_dim (list): Grid points on which the log-likelihood and log-prior were
+            evaluated in the first dimension.
+        grid_points_second_dim (list): Grid points on which the log-likelihood and log-prior were
+            evaluated in the second dimension.
+        return_posterior (bool, optional): Whether to return the posterior distribution as well.
+            Default is False.
+
+    Returns:
+        float: Information gain.
+        np.ndarray (optional): Posterior distribution on the grid, returned if return_posterior is True.
+    """
     log_like_plus_log_prior = log_likelihood_grid + log_prior_grid
     c = np.max(log_like_plus_log_prior)
     likelihood_times_prior_c = np.exp(log_like_plus_log_prior - c)
@@ -109,5 +124,13 @@ def information_gain_2d(
 
 
 def relative_increase_in_information_gain(single_physics_info_gain, multi_physics_info_gain):
-    """Compute the relative increase in information gain."""
+    """Compute the relative increase in information gain.
+
+    Args:
+        single_physics_info_gain (float): Information gain from single-physics data.
+        multi_physics_info_gain (float): Information gain from multi-physics data.
+
+    Returns:
+        float: Relative increase in information gain.
+    """
     return (multi_physics_info_gain - single_physics_info_gain) / single_physics_info_gain

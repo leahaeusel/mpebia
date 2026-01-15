@@ -1,4 +1,4 @@
-"""Evaluate the single-physics and multi-physics posteriors."""
+"""Plot the prior, the likelihoods, and the posterior at an indicated point."""
 
 import matplotlib.pyplot as plt
 import numpy as np

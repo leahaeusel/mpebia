@@ -1,4 +1,4 @@
-"""Evaluate poro model on a grid of different Young's moduli."""
+"""Evaluate poro model on a grid of Young's moduli and coupling strengths."""
 
 import logging
 from pathlib import Path

@@ -1,4 +1,4 @@
-"""Data processor class for csv data extraction."""
+"""Data processor class for the output of the porous medium model."""
 
 import logging
 from pathlib import Path
@@ -21,16 +21,12 @@ class PoroDataProcessor(DataProcessor):
         file_name_identifier=None,
         file_options_dict=None,
     ):
-        """Instantiate data processor class for numpy binary data.
+        """Instantiate data processor class for the porous medium model.
 
         Args:
-            file_name_identifier (str): Identifier of file name.
-                                        The file prefix can contain regex expression
-                                        and subdirectories.
+            file_name_identifier (str): Identifier of file name. The file prefix can contain regex
+                expression and subdirectories.
             file_options_dict (dict): Dictionary with read-in options for the file
-
-        Returns:
-            Instance of DataProcessorNpy class
         """
         if "delete_field_data" not in file_options_dict:
             file_options_dict["delete_field_data"] = False
@@ -54,14 +50,11 @@ class PoroDataProcessor(DataProcessor):
     def get_raw_data_from_file(self, file_path):
         """Get the raw data from the files of interest.
 
-        This method loads the
-        numpy binary data from the file.
-
         Args:
-            file_path (str): Actual path to the file of interest.
+            file_path (str): Path to the file of interest.
 
         Returns:
-            raw_data (np.array): Raw data from file.
+            np.array: Raw data from file.
         """
         try:
             # not really raw data yet but only reader obj
@@ -88,16 +81,12 @@ class PoroDataProcessor(DataProcessor):
     def filter_and_manipulate_raw_data(self, raw_data, coords_all_fields):
         """Filter and manipulate the raw data.
 
-        In this case we want the raw
-        data as it is. Of course this method can implement more specific data
-        processing in the future.
-
         Args:
             raw_data (np.array): Raw data from file.
             coords_all_fields (list, np.array): Coordinates for all or for each data field.
 
         Returns:
-            processed_data (np.array): Cleaned, filtered or manipulated *data_processor* data.
+            np.array: Data of all the provided fields.
         """
         data_fields = self.file_options_dict["data_fields"]
         data_all_fields = []
@@ -119,14 +108,14 @@ class PoroDataProcessor(DataProcessor):
         return data_all_fields
 
     def get_data_from_file(self, base_dir_file, at_dline=True):
-        """Get data at dline from file.
+        """Get data (at dline) from file.
 
         Args:
-            base_dir_file (Path): Path of the base directory that contains the file of interest
-            at_dline (bool): Whether to extract data at dline coordinates or all coordinates
+            base_dir_file (Path): Path of the base directory that contains the file of interest.
+            at_dline (bool): Whether to extract data at dline coordinates or at all coordinates.
 
         Returns:
-            processed_data (np.array): Final data from data processor module
+            np.array: Final data.
         """
         if not base_dir_file:
             raise ValueError(
