@@ -26,14 +26,16 @@ jobs:
         with:
           submodules: True
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install dependencies
+      - uses: conda-incubator/setup-miniconda@v3
+      - name: Set up Python environment
+        id: environment
+        shell: bash -l {0}
         run: |
+          conda env create -f environment.yml
+          conda activate mpebia
           pip install -e .
+          conda clean --all --yes
+          pip cache purge
 
       - name: Install queens
         shell: bash -el {0}
@@ -41,15 +43,22 @@ jobs:
           git clone https://github.com/queens-py/queens.git
           cd queens
           git checkout 699d819baf0bb77ca75aaf2c376428b4ea132d2f
+          conda activate mpebia
           pip install .[safe,fourc]
           cd ..
 
       - name: Run pre-commit to check code quality
         shell: bash -el {0}
-        run: pre-commit run --all-files
+        run: |
+          conda activate mpebia
+          pre-commit run --all-files
 
       - name: Run tests
-        run: pytest
+        shell: bash -el {0}
+        run: |
+          conda activate mpebia
+          pytest
+
       - name: Upload html coverage report
         uses: actions/upload-pages-artifact@v3
         with:
