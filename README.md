@@ -58,13 +58,17 @@ The 4C commit `a1f1d02ca1a0786720cadfcb731fffc5fe19b32b` from https://github.com
 If you use this code or parts of it, please cite the following article:
 
 ```bib
-@misc{haeusel2025,
-      title={Multi-Physics-Enhanced Bayesian Inverse Analysis: Information Gain from Additional Fields},
-      author={Lea J. Haeusel and Jonas Nitzler and Lea J. Köglmeier and Wolfgang A. Wall},
-      year={2025},
-      eprint={2510.11095},
-      archivePrefix={arXiv},
-      url={https://arxiv.org/abs/2510.11095},
+@article{HAEUSEL2026118735,
+title = {Multi-physics-enhanced Bayesian inverse analysis: Information gain from additional fields},
+journal = {Computer Methods in Applied Mechanics and Engineering},
+volume = {452},
+pages = {118735},
+year = {2026},
+issn = {0045-7825},
+doi = {https://doi.org/10.1016/j.cma.2026.118735},
+url = {https://www.sciencedirect.com/science/article/pii/S0045782526000095},
+author = {Lea J. Haeusel and Jonas Nitzler and Lea J. Köglmeier and Wolfgang A. Wall},
+keywords = {Bayesian inverse analysis, Model calibration, Multi-physics data, Coupled fields, Information gain},
 }
 ```
 
