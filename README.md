@@ -6,13 +6,13 @@
 |------------------------------------------------------ | -------: | -------: | ------: | --------: |
 | src/mpebia/\_\_init\_\_.py                            |        0 |        0 |    100% |           |
 | src/mpebia/electromechanical\_model/\_\_init\_\_.py   |        0 |        0 |    100% |           |
-| src/mpebia/electromechanical\_model/cube\_model.py    |       70 |        5 |     93% |93, 164, 200-203 |
-| src/mpebia/entropies.py                               |       33 |        3 |     91% |39, 108, 113 |
+| src/mpebia/electromechanical\_model/cube\_model.py    |       70 |        5 |     93% |92, 163, 209-212 |
+| src/mpebia/entropies.py                               |       33 |        3 |     91% |39, 123, 136 |
 | src/mpebia/logging.py                                 |       17 |        0 |    100% |           |
 | src/mpebia/observations.py                            |       35 |        3 |     91% |     75-78 |
 | src/mpebia/output.py                                  |        7 |        2 |     71% |     28-33 |
 | src/mpebia/porous\_medium\_model/recycle\_metadata.py |       17 |        2 |     88% |     67-68 |
-| src/mpebia/porous\_medium\_model/smart\_driver.py     |       50 |        6 |     88% |97, 110, 144, 152, 169-170 |
+| src/mpebia/porous\_medium\_model/smart\_driver.py     |       50 |        6 |     88% |100, 113, 147, 155, 172-173 |
 | src/mpebia/spacing.py                                 |        4 |        0 |    100% |           |
 | src/mpebia/truncated\_gaussian\_prior.py              |       51 |        0 |    100% |           |
 | **TOTAL**                                             |  **284** |   **21** | **93%** |           |
